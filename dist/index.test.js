@@ -20,5 +20,13 @@ async function runTest() {
     assert(limiter.getTokensRemaining("k1") == 2);
     await new Promise(f => setTimeout(f, 1000));
     assert(limiter.tryRemoveTokens("k1", 4) == true);
+    //new bucket, won't expire until 2 seconds from now
     assert(limiter.getTokensRemaining("k1") == 1);
+    assert(limiter.tryRemoveTokens("k1", 2) == false);
+    await new Promise(f => setTimeout(f, 1900));
+    assert(limiter.tryRemoveTokens("k1", 2) == false);
+    assert(limiter.getTokensRemaining("k1") == 1);
+    await new Promise(f => setTimeout(f, 200));
+    assert(limiter.tryRemoveTokens("k1", 2) == true);
+    assert(limiter.getTokensRemaining("k1") == 3);
 }
