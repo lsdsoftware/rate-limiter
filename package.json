@@ -1,0 +1,24 @@
+{
+  "name": "@lsdsoftware/rate-limiter",
+  "version": "1.0.0",
+  "description": "Basic rate limiter using the token bucket algorithm",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "node dist/index.test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lsdsoftware/rate-limiter.git"
+  },
+  "author": "Hai Phan <hai.phan@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lsdsoftware/rate-limiter/issues"
+  },
+  "homepage": "https://github.com/lsdsoftware/rate-limiter#readme",
+  "devDependencies": {
+    "@types/node": "^20.2.5",
+    "typescript": "^5.0.4"
+  }
+}
