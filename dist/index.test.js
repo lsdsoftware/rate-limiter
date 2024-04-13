@@ -6,7 +6,7 @@ runTest()
     .then(() => console.log("Test successful"))
     .catch(console.error);
 async function runTest() {
-    const limiter = new index_1.RateLimiter({
+    const limiter = (0, index_1.makeRateLimiter)({
         tokensPerInterval: 5,
         interval: 2000
     });

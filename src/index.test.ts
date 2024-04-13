@@ -1,4 +1,4 @@
-import { RateLimiter } from "./index"
+import { makeRateLimiter } from "./index"
 import * as assert from "assert"
 
 runTest()
@@ -7,7 +7,7 @@ runTest()
 
 
 async function runTest() {
-  const limiter = new RateLimiter({
+  const limiter = makeRateLimiter({
     tokensPerInterval: 5,
     interval: 2000
   })

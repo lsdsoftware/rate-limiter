@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RateLimiter = void 0;
+exports.makeRateLimiter = void 0;
 class Bucket {
     constructor(count, expire) {
         this.count = count;
@@ -10,35 +10,34 @@ class Bucket {
         return this.expire > Date.now();
     }
 }
-class RateLimiter {
-    constructor(args) {
-        this.args = args;
-        this.buckets = new Map();
-        this.lastCleanup = Date.now();
-    }
-    getTokensRemaining(key) {
-        const bucket = this.buckets.get(key);
-        return (bucket === null || bucket === void 0 ? void 0 : bucket.isValid()) ? bucket.count : this.args.tokensPerInterval;
-    }
-    tryRemoveTokens(key, numTokens) {
-        if (Date.now() - this.lastCleanup > 2 * this.args.interval) {
-            this.lastCleanup = Date.now();
-            for (const [key, bucket] of this.buckets)
-                if (!bucket.isValid())
-                    this.buckets.delete(key);
+function makeRateLimiter({ tokensPerInterval, interval }) {
+    const buckets = new Map();
+    let lastCleanup = Date.now();
+    return {
+        getTokensRemaining(key) {
+            const bucket = buckets.get(key);
+            return (bucket === null || bucket === void 0 ? void 0 : bucket.isValid()) ? bucket.count : tokensPerInterval;
+        },
+        tryRemoveTokens(key, numTokens) {
+            if (Date.now() - lastCleanup > 2 * interval) {
+                lastCleanup = Date.now();
+                for (const [key, bucket] of buckets)
+                    if (!bucket.isValid())
+                        buckets.delete(key);
+            }
+            let bucket = buckets.get(key);
+            if (!(bucket === null || bucket === void 0 ? void 0 : bucket.isValid())) {
+                bucket = new Bucket(tokensPerInterval, Date.now() + interval);
+                buckets.set(key, bucket);
+            }
+            if (numTokens <= bucket.count) {
+                bucket.count -= numTokens;
+                return true;
+            }
+            else {
+                return false;
+            }
         }
-        let bucket = this.buckets.get(key);
-        if (!(bucket === null || bucket === void 0 ? void 0 : bucket.isValid())) {
-            bucket = new Bucket(this.args.tokensPerInterval, Date.now() + this.args.interval);
-            this.buckets.set(key, bucket);
-        }
-        if (numTokens <= bucket.count) {
-            bucket.count -= numTokens;
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
+    };
 }
-exports.RateLimiter = RateLimiter;
+exports.makeRateLimiter = makeRateLimiter;
